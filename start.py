@@ -1,30 +1,81 @@
 from tkinter import *
 
 
-def check_register_entry():
+
+
+
+def register_user():
+    
     username_info = username.get()
     password_info = password.get()
+    if(len(password_info)<8):
+        invalid_password_register()
+    
     address_info = address.get()
     aadhar_info = aadhar.get()
+    print(type(aadhar_info))
+    if(len(str(aadhar_info))<12):
+        invalid_aadhar_register()
 
-    if(len(aadhar_info) !=12):
-        print("incorrect info")
+    CheckVar1_info = CheckVar1.get()
+    CheckVar2_info = CheckVar2.get()
 
 
+
+
+
+
+    
+
+def invalid_aadhar_register():
+    global invalid_aadhar_screen
+    invalid_aadhar_screen = Toplevel(register_screen)
+    invalid_aadhar_screen.title("Unscuccessful")
+    invalid_aadhar_screen.geometry("300x100")
+    Label(invalid_aadhar_screen,text = "Enter valid UID").pack()
+    Button(invalid_aadhar_screen,text = "OK",command = delete_invalid_aadhar_register).pack()
+
+def delete_invalid_aadhar_register():
+    invalid_aadhar_screen.destroy()
+
+
+        
+       
+
+def invalid_password_register():
+    global invalid_password_screen
+    invalid_password_screen = Toplevel(register_screen)
+    invalid_password_screen.title("Success")
+    invalid_password_screen.geometry("300x100")
+    Label(invalid_password_screen,text = "Minimum 8 character password").pack()
+    Button(invalid_password_screen,text = "OK",command = delete_invalid_password_register).pack()
+
+
+def delete_invalid_password_register():
+    invalid_password_screen.destroy()
+
+    
 
 
 
 def register():
+    global register_screen
     register_screen = Toplevel(main_screen) 
     register_screen.title("Register")
     register_screen.geometry("500x500")
  
 # Set text variables
+    global username
     username = StringVar()
+    global password 
     password = StringVar()
+    global address 
     address = StringVar()
+    global aadhar 
     aadhar = IntVar()
+    global CheckVar1 
     CheckVar1 = IntVar()
+    global CheckVar2 
     CheckVar2 = IntVar()
 
  
@@ -87,7 +138,7 @@ def register():
     Label(register_screen, text="").pack()
     
     # Set register button
-    Button(register_screen, text="Register", width=10, height=1, bg="#fcb603",command = check_register_entry).pack()
+    Button(register_screen, text="Register", width=10, height=1, bg="#fcb603",command = register_user).pack()
 
 def login_verification():
     print("working...")
