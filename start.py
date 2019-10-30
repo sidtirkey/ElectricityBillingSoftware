@@ -14,11 +14,11 @@ def register_user():
     address_info = address.get()
     aadhar_info = aadhar.get()
     print(type(aadhar_info))
-    if(len(str(aadhar_info))<12):
+    if(len(str(aadhar_info))!=12):
         invalid_aadhar_register()
 
-    CheckVar1_info = CheckVar1.get()
-    CheckVar2_info = CheckVar2.get()
+    radiobutton_info = var.get()
+    print(radiobutton_info)
 
 
 
@@ -45,7 +45,7 @@ def delete_invalid_aadhar_register():
 def invalid_password_register():
     global invalid_password_screen
     invalid_password_screen = Toplevel(register_screen)
-    invalid_password_screen.title("Success")
+    invalid_password_screen.title("Unsuccessful")
     invalid_password_screen.geometry("300x100")
     Label(invalid_password_screen,text = "Minimum 8 character password").pack()
     Button(invalid_password_screen,text = "OK",command = delete_invalid_password_register).pack()
@@ -72,11 +72,7 @@ def register():
     global address 
     address = StringVar()
     global aadhar 
-    aadhar = IntVar()
-    global CheckVar1 
-    CheckVar1 = IntVar()
-    global CheckVar2 
-    CheckVar2 = IntVar()
+    aadhar = StringVar()
 
  
 # Set label for user's instruction
@@ -121,24 +117,28 @@ def register():
     aadhar_entry.pack()
 
 
-#set check box and label
-    checkbox_lable = Label(register_screen,text = "Select account type:")
-    checkbox_lable.pack()
-    C1 = Checkbutton(register_screen, text = "Prepaid", variable = CheckVar1, \
-                 onvalue = 1, offvalue = 0, height=2, \
-                 width = 20)
-    C2 = Checkbutton(register_screen, text = "Postpaid", variable = CheckVar2, \
-                 onvalue = 1, offvalue = 0, height=2, \
-                 width = 20)
-
-    C1.pack()
-    C2.pack()
+#set radio button and label
+    set_radioButton()
 
     
     Label(register_screen, text="").pack()
     
     # Set register button
     Button(register_screen, text="Register", width=10, height=1, bg="#fcb603",command = register_user).pack()
+
+
+def set_radioButton():
+    global var
+    var = IntVar()
+
+    Label(register_screen,text = "Enter Payment mode")
+    R1 = Radiobutton(register_screen, text="Prepaid", variable=var, value=1)
+    R1.pack()
+    R2 = Radiobutton(register_screen, text="Postpaid", variable=var, value=2)
+    R2.pack()
+
+
+
 
 def login_verification():
     print("working...")
