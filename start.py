@@ -1,25 +1,68 @@
 from tkinter import *
+from database import *
+from verification import *
 
-
+#pylint: disable-msg=R0913
 
 
 
 def register_user():
-    
+    c = 0
     username_info = username.get()
     password_info = password.get()
-    if(len(password_info)<8):
-        invalid_password_register()
-    
     address_info = address.get()
     aadhar_info = aadhar.get()
-    print(type(aadhar_info))
-    if(len(str(aadhar_info))!=12):
-        invalid_aadhar_register()
-
     radiobutton_info = var.get()
     print(radiobutton_info)
 
+    if( len(username_info)>0  and len(password_info)>0 and len(address_info)>0  and len(aadhar_info)>0  and radiobutton_info !=0):
+
+        if(len(password_info)<8):
+            invalid_password_register()
+        else:
+            c = 1
+        
+
+        if(len(str(aadhar_info))!=12):
+            invalid_aadhar_register()
+        else:
+            c = 1
+
+        if(c == 1):
+            
+            writeOnDatabase(username_info,password_info,aadhar_info,address_info,radiobutton_info)
+            #print("registeration success")
+            register_success()
+
+    else:
+        enter_all_details()
+        
+
+def enter_all_details():
+    global enter_all_details_screen
+    enter_all_details_screen = Toplevel(register_screen)
+    enter_all_details_screen.title("Unscuccessful")
+    enter_all_details_screen.geometry("300x100")
+    Label(enter_all_details_screen,text = "Enter all fields.").pack()
+    Button(enter_all_details_screen,text = "OK",command = delete_enter_all_details_screen).pack()
+
+def delete_enter_all_details_screen():
+    enter_all_details_screen.destroy()
+
+
+
+def register_success():
+    global register_success_screen
+    register_success_screen = Toplevel(register_screen)
+    register_success_screen.title("Success!!!")
+    register_success_screen.geometry("300x100")
+    Label(register_success_screen,text = "Registration successful,You can login NOW!").pack()
+    Button(register_success_screen,text = "OK",command = delete_register_success_screen).pack()
+
+
+def delete_register_success_screen():
+    register_success_screen.destroy()
+    register_screen.destroy()
 
 
 
@@ -141,32 +184,74 @@ def set_radioButton():
 
 
 def login_verification():
-    print("working...")
+    username = username_verify.get()
+    password = password_verify.get()
+    aadhar_number = aadhar_verify.get()
+
+    if(len(username)>0 or len(password)>0 and len(aadhar_number)>0):
+        login_verify(username,aadhar_number,password)
+
+
+
+    else:
+        login_verify_failed()
+
+
+
+
+def login_verify_failed():
+    global login_verify_failed_screen
+    login_verify_failed_screen = Toplevel(login_screen)
+    login_verify_failed_screen.title(" Login Unscuccessful")
+    login_verify_failed_screen.geometry("300x100")
+    Label(login_verify_failed_screen,text = "Enter login details correctly!").pack()
+    Button(login_verify_failed_screen,text = "OK",command = delete_login_verify_failed_screen).pack()
+
+def delete_login_verify_failed_screen():
+    login_verify_failed_screen.destroy()
+
+        
+
+
+
+
+
 
 
 # define login function
-def login():
-    
+def login_screen():
+    global login_screen
     login_screen = Toplevel(main_screen)
     login_screen.title("Login")
-    login_screen.geometry("300x250")
+    login_screen.geometry("300x300")
     Label(login_screen, text="Please enter details below to login").pack()
+    Label(login_screen, text="Enter Username or Aadhar number").pack()
     Label(login_screen, text="").pack()
  
     global username_verify
     global password_verify
+    global aadhar_verify
  
     username_verify = StringVar()
     password_verify = StringVar()
+    aadhar_verify = StringVar()
  
    
-    Label(login_screen, text="Username * ").pack()
+    Label(login_screen, text="Username ").pack()
     username_login_entry = Entry(login_screen, textvariable=username_verify)
     username_login_entry.pack()
+
+    Label(login_screen, text="Aadhar number ").pack()
+    aadhar_login_entry = Entry(login_screen, textvariable=aadhar_verify)
+    aadhar_login_entry.pack()
+
+
+
     Label(login_screen, text="").pack()
     Label(login_screen, text="Password * ").pack()
     password__login_entry = Entry(login_screen, textvariable=password_verify, show= '*')
     password__login_entry.pack()
+
     Label(login_screen, text="").pack()
     Button(login_screen, text="Login", width=10, height=1, command=login_verification).pack()
 
@@ -188,7 +273,7 @@ def main_account_screen():
     Label(text="").pack() 
     
     # create Login Button 
-    Button(text="Login", height="2", width="30", command = login).pack()
+    Button(text="Login", height="2", width="30", command = login_screen).pack()
     Label(text="").pack() 
     
    
