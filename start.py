@@ -1,8 +1,20 @@
 from tkinter import *
 from database import *
 from verification import *
+from fetch_data import *
+from calculation import *
+from functools import partial
+
+
+
 
 #pylint: disable-msg=R0913
+
+
+
+
+
+
 
 
 
@@ -180,23 +192,173 @@ def set_radioButton():
     R2 = Radiobutton(register_screen, text="Postpaid", variable=var, value=2)
     R2.pack()
 
-
+active_account_status = 0
 
 
 def login_verification():
+    
     username = username_verify.get()
     password = password_verify.get()
     aadhar_number = aadhar_verify.get()
+    global active_account_status
+    
+    if(active_account_status == 0):
 
-    if(len(username)>0 or len(password)>0 and len(aadhar_number)>0):
-        login_verify(username,aadhar_number,password)
+        if((len(username)>0 or len(aadhar_number)>0) and len(password)>0): 
+            ID,check = login_verify(username,aadhar_number,password)
+
+            
+            if(check == 1):
+                active_account_status = 1
+                login_successful()
+                User_account_screen(ID)
+
+            else:
+                login_verify_failed()
 
 
+
+        else:
+            login_verify_failed()
 
     else:
-        login_verify_failed()
+        log_out_previous()
+        
+def log_out_previous():
+    global prev_log_out_screen
+    prev_log_out_screen = Toplevel(user_screen)
+    prev_log_out_screen.title("INVALID")
+    prev_log_out_screen.geometry("300x100")
+    Label(prev_log_out_screen,text = "Log out of currently logged in account!").pack()
+    Button(prev_log_out_screen,text = "OK",command = destroy_prev_log_out_screen).pack()
+
+def destroy_prev_log_out_screen():
+    prev_log_out_screen.destroy()
 
 
+def login_successful():
+    global login_successful_screen
+    login_successful_screen = Toplevel(login_screen)
+    login_successful_screen.title("Login successful")
+    login_successful_screen.geometry("300x100")
+    Label(login_successful_screen,text = "Login Successful!").pack()
+    Button(login_successful_screen,text = "Proceed",command = destroy_login_successful_screen).pack()
+
+
+def destroy_login_successful_screen():
+    login_successful_screen.destroy()
+    login_screen.destroy()
+
+
+
+def User_account_screen(ID):
+    
+    record = []
+    records = get_data(ID)
+    #print(len(records[0]))
+    for i in range(0,len(records[0])):
+        record.append(records[0][i])
+
+    
+    global user_screen
+    user_screen = Toplevel(main_screen)
+    user_screen.title("User Account")
+    user_screen.geometry("400x400")
+    Label(user_screen,text = "Customer Details",bg="#fcb603", width="300", height="2", font=("Calibri", 13)).pack()
+    #Label(user_screen,text = "").pack()
+
+    Label(user_screen,text = "USERNAME:"+record[0],bg="#BEDAD8", width="300", height="2", font=("Calibri", 10)).pack()
+    Label(user_screen,text = "UNIQUE IDENTIFICATION NUMBER:"+record[1],bg="#BEDAD8", width="300", height="2", font=("Calibri", 10)).pack()
+    Label(user_screen,text = "CUSTOMER ADDRESS:"+record[2],bg="#BEDAD8", width="300", height="2", font=("Calibri", 10)).pack()
+    Label(user_screen,text = "PAYMENT MODE:"+record[3],bg="#BEDAD8", width="300", height="2", font=("Calibri", 10)).pack()
+    Label(user_screen,text = "UNITS USED:"+(str)(record[4]),bg="#BEDAD8", width="300", height="2", font=("Calibri", 10)).pack()
+    Label(user_screen,text = "MONTHS DUE:"+(str)(record[5]),bg="#BEDAD8", width="300", height="2", font=("Calibri", 10)).pack()
+    
+    
+    Button(user_screen,text="CALCULATE BILL",bg = "#91EAE3",height="2", width="300", command = partial(calculate_bill,ID)).pack()
+    Button(user_screen,text="UPDATE ACCOUNT",bg = "#91EAE3",height="2", width="300", command = partial(update_account,ID)).pack()
+    Button(user_screen,text="LOGOUT",bg = "#91EAE3",height="2", width="300", command =logout_dialog).pack()
+
+
+def update_account():
+    pass
+
+
+
+
+
+   
+
+
+
+
+
+
+
+
+
+
+    
+
+def logout_dialog():
+    print("Enter")
+    global active_account_status
+    active_account_status = 0
+    user_screen.destroy()
+    
+    
+
+
+
+def calculate_bill(ID):
+    bill,fine  = bill_calculation(ID)
+    write_bill(ID,bill,fine)
+    global bill_screen
+    bill_screen = Toplevel(user_screen)
+    bill_screen.title("BILL")
+    bill_screen.geometry("300x300")
+    Label(bill_screen,text = "Bill Details",bg="#fcb603", width="300", height="2", font=("Calibri", 13)).pack()
+    Label(bill_screen,text = "Total amount to be paid:"+(str)(bill),bg="#BEDAD8", width="300", height="2", font=("Calibri", 10)).pack()
+    Label(bill_screen,text = "Fine included in total amount:"+(str)(fine),bg="#BEDAD8", width="300", height="2", font=("Calibri", 10)).pack()
+    
+    Button(bill_screen,text="PAY:"+(str)(bill),bg = "#91EAE3",height="2", width="300", command =partial(bill_payment,ID)).pack()
+    Button(bill_screen,text="CLOSE",bg = "#91EAE3",height="2", width="300", command =close_bill_screen).pack()
+
+
+
+    
+
+    
+def bill_payment(ID):
+    bill = 0
+    fine = 0
+    
+    
+    write_bill(ID,bill,fine)
+    set_unit(ID)
+    global bill_payment_confirm_screen
+    bill_payment_confirm_screen = Toplevel(bill_screen)
+    bill_payment_confirm_screen.title("CONFIRM")
+    bill_payment_confirm_screen.geometry("300x100")
+    Label(bill_payment_confirm_screen,text = "Bill Successfully Paid!").pack()
+    Button(bill_payment_confirm_screen,text = "OK",command = destroy_confirm_screen).pack()
+
+def destroy_confirm_screen():
+    bill_payment_confirm_screen.destroy()
+    bill_screen.destroy()
+
+
+def close_bill_screen():
+    bill_screen.destroy()
+
+
+    
+
+    
+
+
+
+    
 
 
 def login_verify_failed():
@@ -209,13 +371,6 @@ def login_verify_failed():
 
 def delete_login_verify_failed_screen():
     login_verify_failed_screen.destroy()
-
-        
-
-
-
-
-
 
 
 # define login function
@@ -258,6 +413,8 @@ def login_screen():
 
 
 
+
+
 def main_account_screen():
     global main_screen
  
@@ -286,5 +443,3 @@ def main_account_screen():
     main_screen.mainloop()
  
 main_account_screen()
-
-
