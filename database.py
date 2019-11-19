@@ -42,6 +42,39 @@ def set_unit(ID):
 
 
 
+def update_customer_admin(ID,username,password,address,units,month):
+    id = (str)(ID)
+    Units = (str)(units)
+    Month = (str)(month)
+
+    
+    conn = sqlite3.connect('Form.db')
+    with conn:
+        cursor = conn.cursor()
+
+    if(len(username)>0):
+        cursor.execute('UPDATE Customer SET Username = ? WHERE ID = ?',(username,id))
+
+    if(len(password) > 0):
+         cursor.execute('UPDATE Customer SET Password = ? WHERE ID = ?',(password,id))
+
+    if(len(address) > 0):
+         cursor.execute('UPDATE Customer SET Address = ? WHERE ID = ?',(address,id))
+
+    if(units > 0):
+         cursor.execute('UPDATE Customer SET Units = ? WHERE ID = ?',(Units,id))
+
+    if(month > 0):
+         cursor.execute('UPDATE Customer SET Months_due = ? WHERE ID = ?',(Month,id))
+
+
+    conn.commit()
+
+
+
+
+
+
 
     
     

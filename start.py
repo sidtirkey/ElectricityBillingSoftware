@@ -6,7 +6,7 @@ from calculation import *
 from functools import partial
 
 
-
+#pylint: disable-msg=R0913
 
 #pylint: disable-msg=R0913
 
@@ -186,7 +186,8 @@ def set_radioButton():
     global var
     var = IntVar()
 
-    Label(register_screen,text = "Enter Payment mode")
+    Label(register_screen,text = "Enter Payment mode").pack()
+
     R1 = Radiobutton(register_screen, text="Prepaid", variable=var, value=1)
     R1.pack()
     R2 = Radiobutton(register_screen, text="Postpaid", variable=var, value=2)
@@ -226,7 +227,7 @@ def login_verification():
         
 def log_out_previous():
     global prev_log_out_screen
-    prev_log_out_screen = Toplevel(user_screen)
+    prev_log_out_screen = Toplevel(login_screen)
     prev_log_out_screen.title("INVALID")
     prev_log_out_screen.geometry("300x100")
     Label(prev_log_out_screen,text = "Log out of currently logged in account!").pack()
@@ -276,29 +277,9 @@ def User_account_screen(ID):
     
     
     Button(user_screen,text="CALCULATE BILL",bg = "#91EAE3",height="2", width="300", command = partial(calculate_bill,ID)).pack()
-    Button(user_screen,text="UPDATE ACCOUNT",bg = "#91EAE3",height="2", width="300", command = partial(update_account,ID)).pack()
     Button(user_screen,text="LOGOUT",bg = "#91EAE3",height="2", width="300", command =logout_dialog).pack()
 
-
-def update_account():
-    pass
-
-
-
-
-
-   
-
-
-
-
-
-
-
-
-
-
-    
+ 
 
 def logout_dialog():
     print("Enter")
@@ -410,8 +391,213 @@ def login_screen():
     Label(login_screen, text="").pack()
     Button(login_screen, text="Login", width=10, height=1, command=login_verification).pack()
 
+def admin_login_successful():
+    global admin_login_successful_screen
+    admin_login_successful_screen = Toplevel(admin_login_screen)
+    admin_login_successful_screen.title("Admin Login successful")
+    admin_login_successful_screen.geometry("300x100")
+    Label(admin_login_successful_screen,text = "Login Successful!").pack()
+    Button(admin_login_successful_screen,text = "Proceed",command = destroy_admin_login_successful_screen).pack()
+
+def destroy_admin_login_successful_screen():
+    admin_login_successful_screen.destroy()
+    admin_login_screen.destroy()
 
 
+def admin_login_verify_failed():
+    global admin_login_verify_failed_screen
+    admin_login_verify_failed_screen = Toplevel(admin_login_screen)
+    admin_login_verify_failed_screen.title(" Login Unscuccessful")
+    admin_login_verify_failed_screen.geometry("300x100")
+    Label(admin_login_verify_failed_screen,text = "Enter login details correctly!").pack()
+    Button(admin_login_verify_failed_screen,text = "OK",command = delete_admin_login_verify_failed_screen).pack()
+
+def delete_admin_login_verify_failed_screen():
+    admin_login_verify_failed_screen.destroy()
+
+
+
+def admin_options():
+    global admin_options_screen
+    admin_options_screen = Toplevel(main_screen)
+    admin_options_screen.title("Admin options")
+    admin_options_screen.geometry("300x200")
+    Label(admin_options_screen,text = "Choose from below").pack()
+    Label(admin_options_screen,text = "").pack()
+    Button(admin_options_screen,text = "Update customer details:",command = update_customer).pack()
+    Label(admin_options_screen,text = "").pack()
+
+    Button(admin_options_screen,height = "2",width = "10",text = "LOGOUT",command = admin_logout).pack()
+
+
+def admin_logout():
+    global active_account_status
+    active_account_status = 0
+    admin_options_screen.destroy()
+
+
+
+def update_customer():
+    global update_customer_screen
+    global customer_ID 
+    global customer_username 
+    global customer_password 
+    global customer_address 
+    global customer_units 
+    global customer_months 
+
+    customer_ID = IntVar()
+    customer_username = StringVar()
+    customer_password = StringVar()
+    customer_address = StringVar()
+    customer_units = IntVar()
+    customer_months = IntVar()
+
+
+    update_customer_screen = Toplevel(admin_options_screen)
+    update_customer_screen.title("UPDATE")
+    update_customer_screen.geometry("300x350")
+    Label(update_customer_screen,text = "Enter ID").pack()
+    Entry(update_customer_screen,textvariable = customer_ID).pack()
+
+    Label(update_customer_screen,text = "").pack()
+
+    Label(update_customer_screen,text = "Enter customer username to be updated").pack()
+    Entry(update_customer_screen,textvariable = customer_username).pack()
+
+
+    Label(update_customer_screen,text = "Enter password to be updated").pack()
+    Entry(update_customer_screen,textvariable = customer_password,show = "*").pack()
+
+    Label(update_customer_screen,text = "Enter Address to be updated").pack()
+    Entry(update_customer_screen,textvariable = customer_address).pack()
+
+    Label(update_customer_screen,text = "Enter units to be updated").pack()
+    Entry(update_customer_screen,textvariable = customer_units).pack()
+
+    Label(update_customer_screen,text = "Enter monnths due").pack()
+    Entry(update_customer_screen,textvariable = customer_months).pack()
+
+
+    Button(update_customer_screen,text = "UPDATE" , height = "2", width = "10",command = update_customer_get).pack()
+    Label(update_customer_screen,text = "").pack()
+
+    Button(update_customer_screen,text = "CLOSE",height = "2",width = "10",command = destroy_update_customer_screen).pack()
+
+def destroy_update_customer_screen():
+    update_customer_screen.destroy()
+
+
+
+
+def update_customer_get():
+    print("enter")
+    ID = customer_ID.get()
+    username = customer_username.get()
+    password = customer_password.get()
+    address = customer_address.get()
+    units = customer_units.get()
+    months = customer_months.get()
+
+    update_customer_admin(ID,username,password,address,units,months)
+    global success_screen
+    success_screen = Toplevel(update_customer_screen)
+    success_screen.title("success")
+    success_screen.geometry("300x100")
+    Label(success_screen,text = "Updation Successful!").pack()
+    Button(success_screen,text = "OK",command = destroy_success_screen).pack()
+
+def destroy_success_screen():
+    success_screen.destroy()
+
+
+def admin_logout_previous():
+    global admin_prev_log_out_screen
+    admin_prev_log_out_screen = Toplevel(update_customer_screen)
+    admin_prev_log_out_screen.title("INVALID")
+    admin_prev_log_out_screen.geometry("300x100")
+    Label(admin_prev_log_out_screen,text = "Log out of currently logged in account!").pack()
+    Button(admin_prev_log_out_screen,text = "OK",command = destroy_admin_prev_log_out_screen).pack()
+
+def destroy_admin_prev_log_out_screen():
+    admin_prev_log_out_screen.destroy()
+
+
+
+
+
+    
+
+
+
+
+
+def admin_login_verification():
+    username = admin_username_verify.get()
+    password = admin_password_verify.get()
+    global active_account_status
+    
+    if(active_account_status == 0):
+
+        if(len(username)>0  and len(password)>0): 
+            check = admin_login_verify(username,password)
+
+            
+            if(check == 1):
+                active_account_status = 1
+                admin_login_successful()
+                admin_options()
+
+            else:
+                admin_login_verify_failed()
+
+
+
+        else:
+            admin_login_verify_failed()
+
+    #else:
+        #admin_log_out_previous()
+
+
+
+
+
+
+
+
+def admin_login_screen():
+    global admin_login_screen
+    admin_login_screen = Toplevel(main_screen)
+    admin_login_screen.title("Admin Login")
+    admin_login_screen.geometry("300x300")
+    Label(admin_login_screen, text="Please enter details below to login").pack()
+    Label(admin_login_screen, text="").pack()
+ 
+    global admin_username_verify
+    global admin_password_verify
+    
+ 
+    admin_username_verify = StringVar()
+    admin_password_verify = StringVar()
+ 
+   
+    Label(admin_login_screen, text="Username ").pack()
+    username_login_entry = Entry(admin_login_screen, textvariable=admin_username_verify)
+    username_login_entry.pack()
+
+    
+    Label(admin_login_screen, text="").pack()
+    Label(admin_login_screen, text="Password * ").pack()
+    password__login_entry = Entry(admin_login_screen, textvariable=admin_password_verify, show= '*')
+    password__login_entry.pack()
+
+    Label(admin_login_screen, text="").pack()
+    Button(admin_login_screen, text="Login", width=10, height=1, command=admin_login_verification).pack()
+
+
+
+    
 
 
 
@@ -432,12 +618,16 @@ def main_account_screen():
     # create Login Button 
     Button(text="Login", height="2", width="30", command = login_screen).pack()
     Label(text="").pack() 
+
     
    
 
 
 
     Button(text="Register", height="2", width="30", command=register).pack()
+    Label(text = "").pack()
+    Button(text = "Admin Login",height = "2",width = "30",command = admin_login_screen).pack()
+    
     
     
     main_screen.mainloop()
